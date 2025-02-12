@@ -1,0 +1,172 @@
+{% load static %}
+
+<html>
+    <head>
+        <title>Ecom</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+              integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+              crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1" />
+
+        <!-- Make sure this website looks good on mobile devices -->
+ <!-- The code you provided is a utility to retrieve a CSRF token from the cookies of the browser and is often used in web applications to handle Cross-Site Request Forgery (CSRF) protection. -->
+
+	<script type="text/javascript">
+
+        var user = '{{request.user}}'
+
+		function getToken(name) {
+		    var cookieValue = null;
+		    if (document.cookie && document.cookie !== '') {
+		        var cookies = document.cookie.split(';');
+		        for (var i = 0; i < cookies.length; i++) {
+		            var cookie = cookies[i].trim();
+		            // Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+		        }
+		    }
+		    return cookieValue;
+		}
+		var csrftoken = getToken('csrftoken')
+
+        function getCookie(name) {
+		    // Split cookie string and get all individual name=value pairs in an array
+		    var cookieArr = document.cookie.split(";");
+
+		    // Loop through the array elements
+		    for(var i = 0; i < cookieArr.length; i++) {
+		        var cookiePair = cookieArr[i].split("=");
+
+		        /* Removing whitespace at the beginning of the cookie name
+		        and compare it with the given string */
+		        if(name == cookiePair[0].trim()) {
+
+		            return decodeURIComponent(cookiePair[1]);
+		        }
+		    }
+
+		    // Return null if not found
+		    return null;
+		}
+		var cart = JSON.parse(getCookie('cart'))
+
+		if (cart == undefined){
+			cart = {}
+			console.log('Cart Created!', cart)
+			document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+		}
+		console.log('Cart:', cart)
+		</Script>
+    </head>
+    <body>
+    {% if messages %}
+    <div class="alert-container">
+        {% for message in messages %}
+            <div class="alert alert-info" id="message-{{ forloop.counter }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <script type="text/javascript">
+        // Select all message elements
+        setTimeout(function() {
+            // Loop over each message div
+            const messages = document.querySelectorAll('.alert-info');
+            messages.forEach(function(message) {
+                message.style.display = 'none';  // Hide the message after 3 seconds
+            });
+        }, 3000);  // 3000 ms = 3 seconds
+    </script>
+{% endif %}
+
+      <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#333333; height: 80px;">
+<div class="container-fluid d-flex justify-content-between align-items-center" style="height: 100%;">
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+
+        <a class="nav-link" href="{% url 'store' %}" style="font-size: 24px; font-family: 'Times New Roman', sans-serif; color: #fff;">Store <span class="sr-only">(current)</span></a>
+
+      </li>
+    </ul>
+      <nav class="navbar" style=" height: 60px; display: flex; justify-content: center; align-items: center; width: 100%;">
+    <a class="navbar-brand" href="{% url 'store' %}" style="font-size: 36px; font-weight: bold; color: #fff; text-decoration:none; font-family: 'Times New Roman', sans-serif;">
+        Re Store
+    </a>
+</nav>
+   <!-- navbar.html -->
+<ul class="navbar-nav">
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Categories
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'store' %}">All Products</a> <!-- Add this line for All Products -->
+            {% for category in categories %}
+                <a class="dropdown-item" href="{% url 'category' category.name|slugify %}">{{ category.name }}</a>
+            {% endfor %}
+        </div>
+    </li>
+</ul>
+
+
+      <a href="{% url 'search' %}" class="btn btn-warning" style=" margin-right: 10px;">Search</a>
+
+
+
+
+<div class="form-inline my-2 my-lg-0">
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}" class="btn btn-warning" style="margin-right: 10px;">Logout</a>
+    {% else %}
+        <a href="{% url 'login' %}" class="btn btn-warning" style=" margin-right: 10px;">Login</a>
+    {% endif %}
+</div>
+
+	     	<a href="{% url 'cart' %}">
+	    		<img  id="cart-icon" src="{% static 'images/cart.png' %}">
+	    	</a>
+	    	<p id="cart-total">{{ cartItems }}</p></div>
+
+  </div>
+</div>
+
+</nav>
+
+
+        <div class="container">
+            {% block content %}
+            <!-- This is where child templates can add their content -->
+
+            {% endblock %}
+        </div>
+
+
+        <!-- JS files -->
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+                integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+                crossorigin="anonymous"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+                integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+                crossorigin="anonymous"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+                integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+                crossorigin="anonymous"></script>
+
+        <script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
+    </body>
+</html>
