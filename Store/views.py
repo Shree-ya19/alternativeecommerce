@@ -36,12 +36,16 @@ def category(request,foo):
 
 
 def store(request):
+    if request.user.is_authenticated and not hasattr(request.user, 'customer'):
+        Customer.objects.create(user=request.user, name=request.user.username, email=request.user.email)
     data = cartData(request)
 
     cartItems = data['cartItems']
     order = data['order']
     items = data['items']
-
+    if request.user.is_authenticated:
+        if not hasattr(request.user, 'customer'):
+            Customer.objects.create(user=request.user, name=request.user.username, email=request.user.email)
 
     products = Product.objects.all()
     categories = Category.objects.all()
