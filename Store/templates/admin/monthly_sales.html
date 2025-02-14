@@ -1,0 +1,42 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools %}
+    <div class="object-tools">
+        <a href="{% url 'admin:index' %}" class="historylink">Back to admin home</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h2>Monthly Sales Report</h2>
+    <h3>Month: {{ current_month }} Year: {{ current_year }}</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total Amount</th>
+                <th>Order Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in monthly_sales %}
+                <tr>
+                    <td>{{ order.order.id }}</td>
+                    <td>{{ order.order.customer }}</td>
+                    <td>${{ order.total_amount }}</td>
+                    <td>{{ order.order.date_ordered }}</td>
+                    <td>
+                        <!-- Use the default admin delete URL for the order -->
+                        <a href="{% url 'admin:Store_order_delete' order.order.id %}" class="button" title="Delete">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4>Total Sales: ${{ total_sales }}</h4>
+    <h4>Total Transactions: {{ total_transactions }}</h4>
+{% endblock %}
